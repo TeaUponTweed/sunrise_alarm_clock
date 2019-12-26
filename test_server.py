@@ -109,4 +109,4 @@ def turn_off_light():
     return json.dumps({'light_connected': True})
 
 
-run(host='localhost', port=8080, debug=True)
+run(host='0.0.0.0', port=8080, debug=True)
