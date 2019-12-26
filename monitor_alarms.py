@@ -20,7 +20,7 @@ def map_repeat_key_to_int(repeat):
 		return 1
 	elif repeat == 'wednesday':
 		return 2
-	elif repeat == 'thurdsay':
+	elif repeat == 'thursday':
 		return 3
 	elif repeat == 'friday':
 		return 4
