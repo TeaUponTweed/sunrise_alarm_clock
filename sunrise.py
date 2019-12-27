@@ -17,7 +17,7 @@ def do_sunrise_step(light, step, num_steps, start_color, final_color, count=1):
     brightness = brightness1+dx*(brightness2-brightness1)
     try:
         light.set_color((hue, saturation, brightness, temp))
-    except lifxlan.errors.WorkflowException:
+    except: #lifxlan.errors.WorkflowException:
         # TODO do I need to rediscover?
         print('Failed to set color. Waiting abit and trying again')
         time.sleep(1)
@@ -76,11 +76,11 @@ def main():
                 time.sleep(update_interval-deltat)
             else:
                 print('cant keep up! what?')
-    time.sleep(60*60)
+    time.sleep(20*60)
     for _ in range(5):
         try:
             bulb.set_power("off")
-        except lifxlan.errors.WorkflowException:
+        except: # lifxlan.errors.WorkflowException:
             print('failed to power off bulb, trying again in a bit')
             time.sleep(5)
         else:
