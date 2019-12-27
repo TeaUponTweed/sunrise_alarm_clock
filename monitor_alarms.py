@@ -7,8 +7,10 @@ import time
 
 from sunrise import main as sunrise
 
+DIRNAME = os.path.dirname(os.path.realpath(__file__))
+
 def load_alarms():
-	with open('alarms.json') as f:
+	with open(os.path.join('alarms.json')) as f:
 		alarms = json.load(f)
 	return alarms
 

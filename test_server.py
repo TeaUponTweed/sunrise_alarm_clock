@@ -21,10 +21,10 @@ def _transform_alarms(alarms):
         'alarms': list(alarms.values())
     }
 
-ALARM_FILE = 'alarms.json'
+ALARM_FILE = os.path.join(DIRNAME, 'alarms.json')
 def load_alarms(f):
-    if os.path.exists('alarms.json'):
-        with open('alarms.json') as f:
+    if os.path.exists(ALARM_FILE):
+        with open(ALARM_FILE) as f:
             alarms = json.load(f)
     else:
         alarms = {}
@@ -76,7 +76,7 @@ def cancel_alarm():
     else:
         alarms = load_alarms(ALARM_FILE)
         alarms.pop(str(alarm_id), None)
-        with open('alarms.json', 'w') as out:
+        with open(ALARM_FILE, 'w') as out:
             json.dump(alarms, out)
 
         return json.dumps(_transform_alarms(alarms))
