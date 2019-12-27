@@ -92,8 +92,8 @@ After=network.target
 [Service]
 ExecStart=/usr/bin/python3 monitor_alarms.py
 WorkingDirectory=/home/pi/sunrise_alarm_clock
-StandardOutput=inherit
-StandardError=inherit
+StandardOutput=syslog
+StandardError=syslog
 Restart=always
 User=pi
 
@@ -111,8 +111,8 @@ After=network.target
 [Service]
 ExecStart=/usr/bin/python3 test_server.py
 WorkingDirectory=/home/pi/sunrise_alarm_clock
-StandardOutput=inherit
-StandardError=inherit
+StandardOutput=syslog
+StandardError=syslog
 Restart=always
 User=pi
 
