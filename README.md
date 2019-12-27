@@ -81,27 +81,50 @@ npm run webpack:production
 ```
 
 ## Daemonize
-To use `supervisor` to launch scripts on startup and monitor them
+
+Create service files:
 ```sh
-sudo apt-get install supervisor
-sudo service supervisor start
+sudo bash -c 'echo "\
+[Unit]
+Description=Monitor Alarms
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 monitor_alarms.py
+WorkingDirectory=/home/pi/sunrise_alarm_clock
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
+" >  /etc/systemd/system/monitor_alarms.service'
+
+
+
+sudo bash -c 'echo "\
+[Unit]
+Description=Monitor Alarms
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 test_server.py
+WorkingDirectory=/home/pi/sunrise_alarm_clock
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
+" >  /etc/systemd/system/sunrise_alarm.service'
 ```
 
-Create config files:
+Start and enable new services:
 ```sh
-sudo echo "\
-[program:monitor_alrams]
-command=python3 /home/pi/sunrise_alarm_clock/monitor_alarms.py
-" >  /etc/supervisor/conf.d/alarm_monitor.conf
-
-sudo echo "\
-[program:sunrise_alram_server]
-command=python3 /home/pi/sunrise_alarm_clock/test_server.py
-" >  /etc/supervisor/conf.d/sunrise_alarm.conf
-```
-
-Re-read and launch:
-```sh
-supervisorctl reread
-supervisorctl update
+systemctrl start monitor_alarms
+systemctrl enable monitor_alarms
+systemctrl start sunrise_alarm
+systemctrl enable sunrise_alarm
 ```
