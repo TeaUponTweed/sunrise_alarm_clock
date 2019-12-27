@@ -2,9 +2,14 @@
 
 import sys
 import time
-
+import logging
 
 import lifxlan
+
+LOG=logging.getLogger()
+
+logging.basicConfig(level=logging.INFO)
+
 
 
 def do_sunrise_step(light, step, num_steps, start_color, final_color, count=1):
@@ -19,7 +24,7 @@ def do_sunrise_step(light, step, num_steps, start_color, final_color, count=1):
         light.set_color((hue, saturation, brightness, temp))
     except: #lifxlan.errors.WorkflowException:
         # TODO do I need to rediscover?
-        print('Failed to set color. Waiting abit and trying again')
+        LOG.info('Failed to set color. Waiting abit and trying again')
         time.sleep(1)
         if count <= 5:
             do_sunrise_step(light, step, num_steps, start_color, final_color, count=count+1)
@@ -44,13 +49,13 @@ def main():
     # In fact, you don't need to provide LifxLAN with the number of bulbs at all.
     # lifx = LifxLAN() works just as well. Knowing the number of bulbs in advance 
     # simply makes initial bulb discovery faster.
-    print("Discovering lights...")
+    LOG.info("Discovering lights...")
     lifx = lifxlan.LifxLAN(num_lights)
 
     # get devices
     devices = lifx.get_lights()
     if not len(devices):
-        print('Discoverd no lights')
+        LOG.info('Discoverd no lights')
         return
 
     bulb = devices[0]
@@ -67,7 +72,7 @@ def main():
     for j in range(len(colors)-1):
         color, next_color = colors[j], colors[j+1]
         for i in range(num_steps):
-            print(i, j)
+            LOG.info(i, j)
             start_time = time.time()
             do_sunrise_step(bulb, i, num_steps, color, next_color)
             end_time = time.time()
@@ -75,18 +80,20 @@ def main():
             if deltat < update_interval:
                 time.sleep(update_interval-deltat)
             else:
-                print('cant keep up! what?')
+                LOG.info('cant keep up! what?')
     time.sleep(20*60)
     for _ in range(5):
         try:
             bulb.set_power("off")
         except: # lifxlan.errors.WorkflowException:
-            print('failed to power off bulb, trying again in a bit')
+            LOG.info('failed to power off bulb, trying again in a bit')
             time.sleep(5)
         else:
             break
+        finally:
+            bulb.set_power("off")
     else:
-        print('failed to power off bulb!')
+        LOG.info('failed to power off bulb!')
 
 
 if __name__=="__main__":
