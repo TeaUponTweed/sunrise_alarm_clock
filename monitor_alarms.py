@@ -5,6 +5,13 @@ import os
 import math
 import time
 
+import logging
+
+LOG=logging.getLogger()
+
+logging.basicConfig(level=logging.INFO)
+
+
 from sunrise import main as sunrise
 
 DIRNAME = os.path.dirname(os.path.realpath(__file__))
@@ -53,22 +60,22 @@ def main():
 			# if not all(alarm['repeat'].values()):
 			if not any((map_repeat_key_to_int(dow) == now_dt.weekday()) and repeat for dow, repeat in alarm['repeat'].items()):
 				continue
-			# print('ere')
+			# LOG.info('ere')
 			alarm_hour, alarm_min = get_alarm_hour_min(alarm)
 			alarm_time = alarm_min+alarm_hour*60
 			now_min = now_dt.minute+now_dt.hour*60
 
-			# print(now_min)
-			# print(alarm_time)
-			# print(now_dt.hour)
-			# print(alarm_hour)
-			# print(abs(now_dt.hour - alarm_hour+24))
+			# LOG.info(now_min)
+			# LOG.info(alarm_time)
+			# LOG.info(now_dt.hour)
+			# LOG.info(alarm_hour)
+			# LOG.info(abs(now_dt.hour - alarm_hour+24))
 			# delta_hour = min(abs(now_dt.hour - alarm_hour), abs(now_dt.hour - alarm_hour+24))
 			# delta_min = alarm_time - now_min
 			delta_min = 720 - abs(abs(alarm_time - now_min) - 720); 
-			print(delta_min)
+			LOG.info(delta_min)
 			# delta_min = now_dt.minute - alarm_min
-			# print(delta_hour, delta_min)
+			# LOG.info(delta_hour, delta_min)
 			if abs(delta_min) < 2:
 				sunrise()
 		try:
