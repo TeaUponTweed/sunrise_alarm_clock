@@ -260,6 +260,14 @@ let viewModel = (model, dispatcher) => {
             </div>
         </div>
         <div>
+            <button onClick={_ => do_turn_off_light()} className="btn btn-primary btn-warning">
+                {React.string("Turn off light")}
+            </button>
+            <button onClick={_ => do_turn_on_light()} className="btn btn-primary btn-success">
+                {React.string("Turn on light")}
+            </button>
+        </div>
+        <div>
             <table className="table table-striped">
               // <thead>
               //   <tr>
@@ -275,10 +283,6 @@ let viewModel = (model, dispatcher) => {
               </tbody>
             </table>
         </div>
-        <div>
-            <button onClick={_ => do_turn_off_light()} className="btn btn-primary btn-warning">
-                {React.string("Turn off light")}
-            </button>
-        </div>
+
     </div>
 }

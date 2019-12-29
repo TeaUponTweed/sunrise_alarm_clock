@@ -137,6 +137,10 @@ let do_turn_off_light = () => {
     let _ = get_from_api("/api/turn_off_light", Decode.light_status)
 };
 
+let do_turn_on_light = () => {
+    let _ = get_from_api("/api/turn_on_light", Decode.light_status)
+};
+
 // TODO wrap reducer in a meta function that can handle promises
 let maybe_set_new_alarm = (model, dispatcher) => {
     switch (model.alarmSetState) {
