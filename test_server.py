@@ -7,6 +7,7 @@ from bottle import static_file, run, route, post, request, get, response
 
 from lifxlan import LifxLAN
 
+from sunrise import connect
 DIRNAME = os.path.dirname(os.path.realpath(__file__))
 
 @route('/<filepath:path>')
@@ -92,53 +93,52 @@ def alarms():
 @get('/api/turn_off_light')
 def turn_off_light():
     print('Attempting to turn off lights')
-    num_lights = 2
-
-    # instantiate LifxLAN client, num_lights may be None (unknown).
-    # In fact, you don't need to provide LifxLAN with the number of bulbs at all.
-    # lifx = LifxLAN() works just as well. Knowing the number of bulbs in advance 
-    # simply makes initial bulb discovery faster.
-    print("Discovering lights...")
-    lifx = LifxLAN(num_lights)
-
     # get devices
-    devices = lifx.get_lights()
+    devices = connect(2)
+
     if not len(devices):
         print('Discoverd no lights')
         return json.dumps({'light_connected': False})
 
-    bulb = devices[0]
-    bulb.set_power("off")
-    return json.dumps({'light_connected': True})
+    bulb_set = False
+    for bulb in devices:
+        for i in range(3):
+            try:
+                bulb.set_power("off")
+            except Exception as e:
+                print(e, file=sys.stderr)
+                print('Failed to turn off light!', file=sys.stderr)
+            else:
+                bulb_set = True
+                break
+    return json.dumps({'light_connected': bulb_set})
+
 
 @get('/api/turn_on_light')
 def turn_on_light():
     print('Attempting to turn on lights')
-    num_lights = 2
-
-    # instantiate LifxLAN client, num_lights may be None (unknown).
-    # In fact, you don't need to provide LifxLAN with the number of bulbs at all.
-    # lifx = LifxLAN() works just as well. Knowing the number of bulbs in advance 
-    # simply makes initial bulb discovery faster.
-    print("Discovering lights...")
-    lifx = LifxLAN(num_lights)
-
     # get devices
-    devices = lifx.get_lights()
+    devices = connect(2)
+
     if not len(devices):
         print('Discoverd no lights')
         return json.dumps({'light_connected': False})
 
-    bulb = devices[0]
-    color = (65024, 0, 60000, 3000),
-    try:
-        bulb.set_color(color)
-        bulb.set_power("on")
-        return json.dumps({'light_connected': True})
-    except Exception as e:
-        print(e, file=sys.stderr)
-        print('Failed to turn off light!', file=sys.stderr)
-        return json.dumps({'light_connected': False})
+    color = (65024, 0, 60000, 3000)
+    bulb_set = False
+    for bulb in devices:
+        for i in range(3):
+            try:
+                bulb.set_color(color)
+                bulb.set_power("on")
+            except Exception as e:
+                print(e, file=sys.stderr)
+                print('Failed to turn off light!', file=sys.stderr)
+            else:
+                bulb_set = True
+                break
+
+    return json.dumps({'light_connected': bulb_set})
 
 
 run(host='0.0.0.0', port=8080, debug=True)

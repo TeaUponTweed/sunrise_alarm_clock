@@ -41,6 +41,7 @@ Install python dependencies:
 ```sh
 sudo pip3 install lifxlan
 sudo pip3 install bottle
+sudo pip3 install fire
 ```
 
 Clone repo:

@@ -82,7 +82,7 @@ def main():
 			# delta_min = now_dt.minute - alarm_min
 			# LOG.info(delta_hour, delta_min)
 			if abs(delta_min) < 2:
-				sunrise()
+				sunrise(num_lights=2)
 		try:
 			time.sleep(next_check_time_utc_s - time.time())
 		except ValueError:
