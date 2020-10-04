@@ -3,7 +3,7 @@ import json
 import os
 import sys
 
-from bottle import static_file, run, route, post, request, get
+from bottle import static_file, run, route, post, request, get, response
 
 from lifxlan import LifxLAN
 
@@ -11,6 +11,7 @@ DIRNAME = os.path.dirname(os.path.realpath(__file__))
 
 @route('/<filepath:path>')
 def server_static(filepath):
+    response.set_header('cache-control', 'no-cache')
     return static_file(filepath, root=os.path.join(DIRNAME, 'build'))
 
 @route('/')
