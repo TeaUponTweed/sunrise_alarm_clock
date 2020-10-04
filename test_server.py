@@ -92,7 +92,7 @@ def alarms():
 @get('/api/turn_off_light')
 def turn_off_light():
     print('Attempting to turn off lights')
-    num_lights = 1
+    num_lights = 2
 
     # instantiate LifxLAN client, num_lights may be None (unknown).
     # In fact, you don't need to provide LifxLAN with the number of bulbs at all.
@@ -114,7 +114,7 @@ def turn_off_light():
 @get('/api/turn_on_light')
 def turn_on_light():
     print('Attempting to turn on lights')
-    num_lights = 1
+    num_lights = 2
 
     # instantiate LifxLAN client, num_lights may be None (unknown).
     # In fact, you don't need to provide LifxLAN with the number of bulbs at all.

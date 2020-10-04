@@ -5,11 +5,11 @@ import os
 import math
 import time
 
-import logging
+# import logging
 
-LOG=logging.getLogger()
+# LOG=logging.getLogger()
 
-logging.basicConfig(level=logging.INFO)
+# logging.basicConfig(level=logging.INFO)
 
 
 from sunrise import main as sunrise
@@ -17,8 +17,13 @@ from sunrise import main as sunrise
 DIRNAME = os.path.dirname(os.path.realpath(__file__))
 
 def load_alarms():
-	with open(os.path.join('alarms.json')) as f:
-		alarms = json.load(f)
+	apath = os.path.join(DIRNAME, 'alarms.json')
+	if os.path.exists(apath):
+		with open(apath) as f:
+			alarms = json.load(f)
+	else:
+		alarms = {}
+
 	return alarms
 
 # def convert_alarm_to_dt(alarm):
@@ -73,7 +78,7 @@ def main():
 			# delta_hour = min(abs(now_dt.hour - alarm_hour), abs(now_dt.hour - alarm_hour+24))
 			# delta_min = alarm_time - now_min
 			delta_min = 720 - abs(abs(alarm_time - now_min) - 720); 
-			LOG.info(delta_min)
+			# LOG.info(delta_min)
 			# delta_min = now_dt.minute - alarm_min
 			# LOG.info(delta_hour, delta_min)
 			if abs(delta_min) < 2:
