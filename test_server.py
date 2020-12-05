@@ -10,6 +10,7 @@ from lifxlan import LifxLAN
 from sunrise import connect
 DIRNAME = os.path.dirname(os.path.realpath(__file__))
 
+
 @route('/<filepath:path>')
 def server_static(filepath):
     response.set_header('cache-control', 'no-cache')
@@ -18,6 +19,10 @@ def server_static(filepath):
 @route('/')
 def server_static(filepath="index.html"):
     return static_file(filepath, root=os.path.join(DIRNAME, 'build'))
+
+@route('/health')
+def health():
+    return "All good\n"
 
 def _transform_alarms(alarms):
     return {
@@ -124,7 +129,8 @@ def turn_on_light():
         print('Discoverd no lights')
         return json.dumps({'light_connected': False})
 
-    color = (65024, 0, 60000, 3000)
+    # color = (65024, 0, 60000, 3000)
+    color = (7680, 0, 32500, 2500)
     bulb_set = False
     for bulb in devices:
         for i in range(3):
