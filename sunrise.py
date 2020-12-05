@@ -9,6 +9,30 @@ import lifxlan
 from lifxlan import LifxLAN
 
 
+class wrap_lifx_retry_ret_err(object):
+    def __init__(self, tries, wait_retry=None):
+        self.tries = tries
+        self.wait_retry = wait_retry
+    def __call__(self, f):
+        def g(*args, **kwargs):
+            for ntry in range(self.tries):
+                try:
+                    ret = f(*args, **kwargs)
+                except (lifxlan.errors.WorkflowException, OSError) as e:
+                    if ntry == self.tries - 1:
+                        return True
+                    else:
+                        if self.wait_retry is not None:
+                            time.sleep(self.wait_retry)
+                else:
+                    assert ret is False
+                    return ret
+            return True        
+
+        return g
+
+
+@wrap_lifx_retry_ret_err(3, 0.01)
 def do_sunrise_step(light, step, num_steps, start_color, final_color):
     dx = step/num_steps
     hue1,saturation1,brightness1,temp1 = start_color
@@ -17,14 +41,24 @@ def do_sunrise_step(light, step, num_steps, start_color, final_color):
     saturation = saturation1+dx*(saturation2-saturation1)
     temp = temp1+dx*(temp2-temp1)
     brightness = brightness1+dx*(brightness2-brightness1)
-    try:
-        light.set_color((hue, saturation, brightness, temp))
-    except lifxlan.errors.WorkflowException:
-        print("*** workflow exception ***")
-        return 1
-    else:
-        return 0
+    light.set_color((hue, saturation, brightness, temp))
+    return False
 
+@wrap_lifx_retry_ret_err(3, 0.01)
+def turn_light_on(bulb):
+    bulb.set_color([768, 65535, 0, 3200])
+    bulb.set_power(65535)
+    return False
+
+@wrap_lifx_retry_ret_err(3, 0.01)
+def turn_light_on_dim(bulb):
+    bulb.set_color((7680, 0, 32500, 2500))
+    bulb.set_power("on")
+    return False
+@wrap_lifx_retry_ret_err(3, 0.01)
+def turn_light_off(bulb):
+    bulb.set_power("off")
+    return False
 
 colors = [ # hue staturation brighness kelvin
     (768, 65535, 0, 2500),
@@ -40,8 +74,12 @@ def connect(expected_num_lights, ntries=5):
     print("Discovering lights...")
     devices = []
     for i in range(ntries):
-        lifx = lifxlan.LifxLAN(expected_num_lights)
-        devices = lifx.get_lights()
+        try:
+            lifx = lifxlan.LifxLAN(expected_num_lights)
+            devices = lifx.get_lights()
+        except (OSError, lifxlan.errors.WorkflowException):
+            time.sleep(0.1)
+            continue
         if expected_num_lights is None:
             if len(devices) > 0:
                 break
@@ -77,8 +115,7 @@ def main(test=False, num_lights=None):
     num_steps = round(total_steps/(len(colors) -1))
     for bulb in devices:
         # turn on and set brightness to zero
-        bulb.set_color([768, 65535, 0, 3200])
-        bulb.set_power(65535)
+        turn_light_on(bulb)
         time.sleep(.1)
 
     # step through all colors
@@ -95,8 +132,8 @@ def main(test=False, num_lights=None):
                 err = do_sunrise_step(bulb, i, num_steps, color, next_color)
                 if err:
                     print('error with one bulb')
+                    err_count += 1
 
-                err_count += err
                 time.sleep(.1)
 
             if err_count == 2:
@@ -115,9 +152,19 @@ def main(test=False, num_lights=None):
         time.sleep(60*60)
 
     for bulb in devices:
-        bulb.set_power("off")
-        time.sleep(.1)
+        err = turn_light_off(bulb)
+        if err:
+            print("Failed to power off bulb")
 
 
 if __name__=="__main__":
-    fire.Fire(main)
+    devices = connect(2)
+    for bulb in devices:
+        # turn on and set brightness to zero
+        turn_light_on_dim(bulb)
+        time.sleep(.1)
+    # turn_light_on(bulb):
+    # bulb.set_color([768, 65535, 0, 3200])
+    # bulb.set_power(65535)
+    # return False
+    # fire.Fire(main)
