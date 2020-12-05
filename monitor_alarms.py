@@ -48,8 +48,15 @@ def map_repeat_key_to_int(repeat):
 def get_alarm_hour_min(alarm):
 	hour = alarm['hour']
 	minute = alarm['minute']
-	if not alarm['isAM']:
-		hour += 12
+	if hour == 12:
+		if alarm['isAM']:
+			hour = 0
+		else:
+			hour = 12
+	else:
+		if not alarm['isAM']:
+			hour += 12
+
 	return hour, minute
 
 def main():
