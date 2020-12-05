@@ -124,8 +124,22 @@ WantedBy=multi-user.target
 
 Start and enable new services:
 ```sh
-systemctrl start monitor_alarms
-systemctrl enable monitor_alarms
-systemctrl start sunrise_alarm
-systemctrl enable sunrise_alarm
+systemctl start monitor_alarms
+systemctl enable monitor_alarms
+systemctl start sunrise_alarm
+systemctl enable sunrise_alarm
+```
+
+
+Add health check for server every five minutes
+```
+$ sudo crontab -e
+# Add:
+*/5 * * * * /home/pi/sunrise_alarm_clock/health.sh
+```
+
+
+To sync local files:
+```
+rsync -arzv --exclude .git --exclude node_modules ../sunrise_alarm_clock pi@XXX.XXX.X.XX:
 ```
