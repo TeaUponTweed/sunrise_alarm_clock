@@ -6,4 +6,5 @@ npm-debug.log
 /node_modules/
 *.bs.js
 alarms.json
-
+*.swp
+*.swo
